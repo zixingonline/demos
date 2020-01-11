@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<div class="layui-inline" id="datePicker"></div>
+
+	<script src="./layui/layui.js"></script>
+	<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+</body>
+<script>
+	let dateArr = [];
+	layui.use(['layer', 'laydate'], function () {
+        var layer = layui.layer,
+            laydate = layui.laydate;
+
+        var data = {};
+        var new_date = new Date();
+        loding_date(new_date, data);
+
+        function loding_date(date_value, data) {
+            laydate.render({
+                elem: '#datePicker', 
+                type: 'date', 
+                theme: 'grid', 
+                min: 0,
+                max: '2099-06-16 23:59:59', 
+                position: 'static', 
+                range: false, 
+                value: date_value, 
+                isInitValue: false, 
+                calendar: false, 
+                btns: false, 
+                showBottom: false,
+                ready: function (value) {
+                    hide_mr(value);
+                }, 
+                done: function (value, date, endDate) {
+                	var selectArr = filterArr(dateArr, value);
+                	console.log(selectArr);			// 选中的值在这里
+                    chose_moban(value, data)
+                }, 
+                change: function (value, date) {
+                    hide_mr(date);
+                }, 
+                mark: data
+            });
+        }
+
+        function filterArr(arr, date){
+            if (arr.indexOf(date) == -1) {
+                arr.push(date);
+            } else {
+                arr.splice(arr.indexOf(date), 1);
+            }
+            arr.sort((a,b) => {
+                return a > b ? 1 : -1;
+            })
+            return arr;
+        }
+
+        function hide_mr(value) {
+            var mm = value.year + '-' + value.month + '-' + value.date;
+            $('.laydate-theme-grid table tbody').find('[lay-ymd="' + mm + '"]').removeClass('layui-this');
+        }
+
+        function chose_moban(obj_date, markJson) {
+            $('#datePicker').html('');
+            if (markJson.hasOwnProperty(obj_date)) {
+                delete markJson[obj_date]
+            } else {
+                markJson[obj_date] = ''
+            }
+            loding_date(obj_date, markJson);
+        }
+    }) 
+</script>
+</html>
